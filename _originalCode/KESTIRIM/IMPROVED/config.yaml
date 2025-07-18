@@ -1,0 +1,24 @@
+# Configuration for the High-Temperature Shock Solver
+
+# --------------------------------------------------------------------------
+# Solver Settings
+# Parameters that control the numerical solver's behavior.
+# --------------------------------------------------------------------------
+solver_settings:
+  max_iterations: 100
+  error_tolerance: 1.0e-4 # A tighter tolerance for better accuracy
+
+# --------------------------------------------------------------------------
+# Gas Model Settings
+# Specifies the Cantera gas model to be used for the simulation.
+# --------------------------------------------------------------------------
+model_settings:
+  gas_yaml: 'airNASA9-transport.yaml' # As used in your original file
+
+# --------------------------------------------------------------------------
+# Output Settings
+# Defines where to save logs and results data.
+# --------------------------------------------------------------------------
+output_settings:
+  log_file: 'simulation.log'
+  results_file: 'nshock_results.csv'

@@ -1,62 +1,28 @@
-# view_structure.py
-import os
+import cantera as ct
+import numpy as np
+import math
+from utilities import equilibrium_speed_of_sound as eqsound
+from solvers.shock_expansion import solve_normal_shock as nshock
 
-def generate_project_tree(start_path='.', ignore_dirs=None, ignore_files=None):
-    """
-    Generates and prints a tree-like diagram of a project directory.
+# print(eqsound.__doc__)    
 
-    Args:
-        start_path (str): The root directory to start the scan from.
-        ignore_dirs (set): A set of directory names to ignore.
-        ignore_files (set): A set of file names to ignore.
-    """
-    # Set default ignored directories if none are provided
-    if ignore_dirs is None:
-        ignore_dirs = {'.git', '__pycache__', '.vscode', 'venv', '.idea'}
+myair = ct.Solution('airNASA9-transport.yaml')
+myair.TP = 300, 101325
+myair.equilibrate('TP')
 
-    # Set default ignored files, including this script itself
-    if ignore_files is None:
-        ignore_files = {os.path.basename(__file__), '.gitignore'}
+myair.TPX = 300, 101325, 'O2:0.21, N2:0.79'
 
-    # Get the name of the root directory to print first
-    project_root_name = os.path.basename(os.path.abspath(start_path))
-    print(f"{project_root_name}/")
+a = eqsound(myair) # type: ignore
+b = math.sqrt(1.4* 287.05 * myair.T) # Speed of sound in air at 300 K
 
-    # Start the recursive generation of the tree
-    _recursive_tree_builder(start_path, "", ignore_dirs, ignore_files)
+print(f"Calculated speed of sound: {a:.2f} m/s")
+print(f"Expected speed of sound: {b:.2f} m/s")
+# Expected output: 340.29 m/s (approximately)
 
-def _recursive_tree_builder(directory, prefix, ignore_dirs, ignore_files):
-    """
-    Recursively builds and prints the directory tree.
-    """
-    try:
-        # Get all items in the current directory, filtering out ignored ones
-        items = [item for item in os.listdir(directory) if item not in ignore_dirs and item not in ignore_files]
-        items.sort()
-    except FileNotFoundError:
-        print(f"Error: Directory not found at {directory}")
-        return
-    except PermissionError:
-        print(f"Error: Permission denied for directory {directory}")
-        return
+mach_numbers = np.array([5, 10, 15])
+temperatures = np.array([300, 400, 500]) # Kelvin
+pressures = np.ones(3) * 101325 # Pascals
 
-    # Define the tree branch characters
-    pointers = ['├── '] * (len(items) - 1) + ['└── ']
-
-    for pointer, item_name in zip(pointers, items):
-        full_path = os.path.join(directory, item_name)
-        print(prefix + pointer + item_name)
-
-        if os.path.isdir(full_path):
-            # Determine the prefix for the next level of the tree
-            # If the current item is the last one, the prefix should be empty space
-            extension = '│   ' if pointer == '├── ' else '    '
-            # Recurse into the subdirectory
-            _recursive_tree_builder(full_path, prefix + extension, ignore_dirs, ignore_files)
-
-
-if __name__ == "__main__":
-    # The script will scan the directory it is placed in.
-    # To run, place this file in your project's root folder and execute:
-    # python view_structure.py
-    generate_project_tree('.')
+M2_arr, T2_arr, p2_arr = nshock(M1=mach_numbers, T=temperatures, p=pressures)
+for i in range(len(mach_numbers)):
+    print(f"M1={mach_numbers[i]:.1f} -> T2={T2_arr[i]:.1f} K, p2={p2_arr[i]/1e5:.2f} bar")

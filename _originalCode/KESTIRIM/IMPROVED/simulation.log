@@ -1,0 +1,7 @@
+2025-06-25 12:38:56,527 - INFO - --- Starting High-Temperature Shock Simulation ---
+2025-06-25 12:38:56,527 - INFO - Configuration loaded from config.yaml
+2025-06-25 12:38:56,527 - INFO - Initial Upstream State: FlowState(M=28.000, u=9443.5 m/s, P=48.1 Pa, T=283.0 K, rho=0.000592 kg/m^3)
+2025-06-25 12:38:56,542 - INFO - Calling nshock solver...
+2025-06-25 12:38:56,543 - INFO - Final Downstream State: FlowState(M=43.432, u=864.6 m/s, P=48038.9 Pa, T=25869.6 K, rho=0.006470 kg/m^3)
+2025-06-25 12:38:56,560 - INFO - Results successfully saved to nshock_results.csv
+2025-06-25 12:38:56,560 - INFO - --- Simulation Finished ---
